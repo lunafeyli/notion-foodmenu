@@ -37,13 +37,6 @@ export default function Home({ products, title }: Props) {
 }
 
 export async function getStaticProps() {
-  if (!process.env.API_URL) return {
-    props: {
-      products: [],
-      title: ""
-    },
-  }
-
   const res = await fetch(process.env.API_URL + '/api/products')
   const products = await res.json()
   const results = products.results
