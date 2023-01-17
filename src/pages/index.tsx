@@ -13,26 +13,24 @@ type Props = {
   title: any;
 }
 
-export default function Home({}: Props) {
-  const [products, setProducts] = useState<IProduct[]>([])
-  const [title, setTitle] = useState("FoodMenu")
+export default function Home({ products, title }: Props) {
+  // const [products, setProducts] = useState<IProduct[]>([])
+  // const [title, setTitle] = useState("...")
 
-  useEffect(() => {
-    async function fetchData() {
-      const res = await fetch(process.env.API_URL + '/api/products')
-      const products = await res.json()
-      const results = products.results
+  // useEffect(() => {
+  //   async function fetchData() {
+  //     const resP = await fetch('/api/products')
+  //     const resM = await fetch('/api/menu_name')
+  //     const products = await resP.json()
+  //     const menu = await resM.json()
+  //     const results = products.results
 
-      setProducts(results)
+  //     setProducts(results)
+  //     setTitle(menu.menu_name)
+  //   }
 
-      const pageId = process.env.PAGE_ID;
-      const page = await notion.pages.retrieve({ page_id: pageId });
-
-      setTitle(page.properties.title.title[0].plain_text)
-    }
-
-    fetchData()
-  }, [])
+  //   fetchData()
+  // }, [])
 
   return (
     <>
@@ -57,18 +55,17 @@ export default function Home({}: Props) {
   )
 }
 
-// export async function getStaticProps() {
-//   const res = await fetch(process.env.API_URL + '/api/products')
-//   const products = await res.json()
-//   const results = products.results
+export async function getStaticProps() {
+  const resP = await fetch(process.env.API_URL + '/api/products')
+  const resM = await fetch(process.env.API_URL + '/api/menu_name')
+  const products = await resP.json()
+  const menu = await resM.json()
+  const results = products.results
 
-//   const pageId = process.env.PAGE_ID;
-//   const page = await notion.pages.retrieve({ page_id: pageId });
-
-//   return {
-//     props: {
-//       products: results,
-//       title: page.properties.title.title[0].plain_text
-//     },
-//   }
-// }
+  return {
+    props: {
+      products: results,
+      title: menu.menu_name
+    },
+  }
+}
