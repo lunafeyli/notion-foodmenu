@@ -3,6 +3,7 @@ import Image from 'next/image'
 import { Product as IProduct } from '@/@types/Product'
 import { Product } from '@/components/Product'
 import { CategoryTitle } from '@/components/CategoryTitle'
+import { useEffect, useState } from 'react'
 const { Client } = require('@notionhq/client');
 
 const notion = new Client({ auth: process.env.NOTION_SECRET });
@@ -12,7 +13,27 @@ type Props = {
   title: any;
 }
 
-export default function Home({ products, title }: Props) {
+export default function Home({}: Props) {
+  const [products, setProducts] = useState<IProduct[]>([])
+  const [title, setTitle] = useState("FoodMenu")
+
+  useEffect(() => {
+    async function fetchData() {
+      const res = await fetch(process.env.API_URL + '/api/products')
+      const products = await res.json()
+      const results = products.results
+
+      setProducts(results)
+
+      const pageId = process.env.PAGE_ID;
+      const page = await notion.pages.retrieve({ page_id: pageId });
+
+      setTitle(page.properties.title.title[0].plain_text)
+    }
+
+    fetchData()
+  }, [])
+
   return (
     <>
       <Head>
@@ -36,18 +57,18 @@ export default function Home({ products, title }: Props) {
   )
 }
 
-export async function getStaticProps() {
-  const res = await fetch(process.env.API_URL + '/api/products')
-  const products = await res.json()
-  const results = products.results
+// export async function getStaticProps() {
+//   const res = await fetch(process.env.API_URL + '/api/products')
+//   const products = await res.json()
+//   const results = products.results
 
-  const pageId = process.env.PAGE_ID;
-  const page = await notion.pages.retrieve({ page_id: pageId });
+//   const pageId = process.env.PAGE_ID;
+//   const page = await notion.pages.retrieve({ page_id: pageId });
 
-  return {
-    props: {
-      products: results,
-      title: page.properties.title.title[0].plain_text
-    },
-  }
-}
+//   return {
+//     props: {
+//       products: results,
+//       title: page.properties.title.title[0].plain_text
+//     },
+//   }
+// }
